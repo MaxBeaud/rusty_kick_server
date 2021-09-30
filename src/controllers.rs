@@ -1,37 +1,33 @@
-use rocket::{http::Status, serde::json::Json};
-use crate::models::{User, UserSignUp};
+use rocket::{State, http::{Cookie, CookieJar, Status}, serde::json::Json};
+use crate::{models::{User, UserSignUp}, services::UserService};
 
-static mut USERS: Vec<User> = Vec::new();
 
 #[post("/signin", data="<model>")]
-pub fn signin(model: Json<User>) -> rocket::http::Status {
-    unsafe {
-        for user in USERS {
-            if user.username == model.username && user.password == model.password {
-                return Status::Accepted;
-            }
-            else {
-                return Status::Forbidden;
-            }
+pub fn signin(model: Json<User>, cookies: &CookieJar<'_>, service: &State<UserService>) -> rocket::http::Status {
+    
+    if service.contains_user(cookies.get_private("user").unwrap().value()) {
+        return Status::Accepted;
+    }    
+    for user in service.get_users() {
+        if user.username == model.username && user.password == model.password {
+            cookies.add_private(Cookie::new("user", model.username.to_string()));
+            return Status::Accepted;
         }
-    }  
-    Status::Ok
+    }
+    Status::Unauthorized
 }
 
 #[post("/signup", data="<model>")]
-pub fn signup(model: Json<UserSignUp>) -> rocket::http::Status {
+pub fn signup(model: Json<UserSignUp>, service: State<UserService>) -> rocket::http::Status {
     println!("Model: {:?}", model);
-    let user_to_add = User::new(model.id, &model.username, &model.password);
-    unsafe {
-        if 
-        model.password == model.password_confirm && 
-        !USERS.contains(&user_to_add)
-        {
-            USERS.push(user_to_add);
-        }
-        else {
-            return Status::Conflict;
-        }
-    }    
+    
+    let user_to_add = User::new(service.get_users().len() as i32, &model.username, &model.password);
+
+    if model.password == model.password_confirm && !service.contains_user(&user_to_add.username) {
+        service.add(user_to_add);
+    }
+    else {
+        return Status::Unauthorized;
+    }
     Status::Created
 }

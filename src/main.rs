@@ -2,15 +2,17 @@
 
 mod controllers;
 mod models;
+mod services;
 use controllers::{signin, signup};
-use crate::models::User;
+
+use crate::services::UserService;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
-    let mut USERS: Vec<User> = Vec::new();
-    
+ 
     rocket::build()
         .mount("/", routes![signin, signup])
+        .manage(UserService::new())
         .launch()
         .await
 }
