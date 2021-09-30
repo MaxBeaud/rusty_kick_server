@@ -1,14 +1,14 @@
 use std::fmt;
-use rocket::serde::{Deserialize};
+use rocket::serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, PartialEq)]
 pub struct User {
     pub id: i32,
     pub username: String,
     pub password: String
 }
 impl User {
-    pub fn new(num: i32, name: &str, pass: &str) -> Self {
+    pub fn new(num: i32, name: &str, pass: & str) -> Self {
         User {
             id: num,
             username: name.to_string(),
@@ -17,11 +17,10 @@ impl User {
     }
 }
 impl fmt::Debug for User {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_fmt(format_args!("{} id:{} hash:{}",self.username, self.id, self.password))
     }
 }
-
 
 #[derive(Deserialize)]
 pub struct UserSignUp {
