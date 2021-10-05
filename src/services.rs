@@ -1,6 +1,5 @@
 use std::sync::Mutex;
 use crate::models::User;
-//use std::ops::DerefMut;
 
 
 pub struct UserService {

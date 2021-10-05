@@ -3,42 +3,64 @@ use crate::{models::{User, UserSignIn, UserSignUp}, services::UserService};
 
 
 #[post("/signin", data="<model>")]
-pub fn signin(model: Option<Json<UserSignIn>>, cookies: &CookieJar<'_>, service: &State<UserService>) -> rocket::http::Status {
+pub async fn signin(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<UserService>) -> (Status, Json<String>) {
     
-    match &model {
+    match model {
         Some(e) => {
             for user in service.get_users() {
                 if user.username == e.username && user.password == e.password {
-                    cookies.add_private(Cookie::new("user", e.username.to_string()));
-                    return Status::Accepted;
+                    jar.add_private(Cookie::new("USER", e.username.to_string()));
+                    return (Status::Accepted, Json(user.username));
                 }
             }
-            Status::Unauthorized
+            (Status::Unauthorized, Json(String::from("WOOPELAYE")))
         },
         None => {
-            let cookie = cookies.get_private("user").unwrap_or_else(|| Cookie::new("none", "none"));
-
-            if cookie.value() != "none" && service.contains_user(cookie.value()) {
-                Status::Accepted
-            }
-            else {
-                Status::Unauthorized
+            let cookie = jar.get_private_pending("USER");
+            match cookie {
+                Some(cookie) => {
+                    if service.contains_user(cookie.value()) {
+                        return (Status::Accepted, Json(cookie.value().to_string()));
+                    }
+                    (Status::Unauthorized, Json(String::from("WOOPELAYE")))
+                }
+                None => {
+                    (Status::Unauthorized, Json(String::from("WOOPELAYE")))
+                }
             }
         }
     }   
 }
 
 #[post("/signup", data="<model>")]
-pub fn signup(model: Json<UserSignUp>, service: &State<UserService>) -> rocket::http::Status {
-    println!("Model: {:?}", model);
-    
-    let user_to_add = User::new(service.get_users().len() as i32, &model.username, &model.password);
+pub async fn signup(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &State<UserService>) -> (Status, Json<String>) {       
 
-    if model.password == model.password_confirm && !service.contains_user(&user_to_add.username) {
-        service.add(user_to_add);
+    match model {      
+        Some(e) => {
+            let user_to_add = User::new(&e.username, &e.password);
+            if service.contains_user(&user_to_add.username) {
+                return (Status::Conflict, Json(String::from("Compte existe déjà")));
+            }
+            else if e.password == e.password_confirm {        
+                service.add(user_to_add);
+                jar.add_private(Cookie::new("USER", e.username.clone()));
+                return (Status::Created, Json(e.username.clone()));
+            }
+            (Status::Unauthorized, Json(String::from("Mauvais MP")))
+        },
+        None => {
+            (Status::Unauthorized, Json(String::from("Pas de model valide")))
+        }
     }
-    else {
-        return Status::Unauthorized;
-    }
-    Status::Created
+}
+
+#[post("/signout")]
+pub async fn signout(jar: &CookieJar<'_>) -> (Status, Json<String>) {       
+    jar.remove_private(Cookie::named("USER"));
+    (Status::Ok, Json(String::from("")))
+}
+
+#[get("/userlist")]
+pub async fn userlist(service: &State<UserService>) -> Json<Vec<User>> {       
+    Json(service.get_users())
 }
