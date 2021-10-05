@@ -998,6 +998,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ripemd256"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "491bb76de0be1f7dc7caf8098176969be67ed306d6f7495800b5709c1b5b492e"
+dependencies = [
+ "block-buffer",
+ "digest",
+ "opaque-debug",
+]
+
+[[package]]
 name = "rocket"
 version = "0.5.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1114,6 +1125,7 @@ name = "rusty_kick_server"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "ripemd256",
  "rocket",
  "serde",
  "uuid",

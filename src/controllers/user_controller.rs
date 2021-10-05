@@ -8,7 +8,7 @@ pub async fn signin(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, servic
     match model {
         Some(e) => {
             for user in service.get_users() {
-                if user.username == e.username && user.password == e.password {
+                if user.username == e.username && user.is_valid_password(e.password.clone()) {
                     jar.add_private(Cookie::new("USER", e.username.to_string()));
                     return (Status::Accepted, Json(user.username));
                 }
