@@ -12,7 +12,7 @@ pub struct User {
 }
 impl User {
     pub fn new(name: &str, pass: & str) -> Self {
-        User {
+        Self {
             id: Uuid::new_v4(),
             username: name.to_string(),
             password: Ripemd256::digest(pass.as_bytes()).to_vec()
