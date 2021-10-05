@@ -3,7 +3,7 @@
 mod controllers;
 mod models;
 mod services;
-use rocket::config::Config;
+use rocket::config::{Config, SecretKey};
 use crate::{controllers::{signin, signout, signup, userlist}, services::UserService};
 
 #[rocket::main]
@@ -21,11 +21,9 @@ async fn main() -> Result<(), rocket::Error> {
         68, 55, 83, 71, 10
     ];
 
-    let figment = Config::figment()
-        .merge(("secret_key",rand));
-
-    let config = Config::from(figment);
-
+    let mut config = Config::from(Config::figment());
+    config.secret_key = SecretKey::generate().unwrap_or_else(|| SecretKey::from(&rand));
+    
     rocket::custom(config)
         .mount("/api/id", routes![
             signin, 
