@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use rocket::{ serde::{Deserialize, Serialize}};
 use uuid::Uuid;
 
-#[derive(Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Task {
     pub id: Uuid,
     pub name: String,

@@ -4,18 +4,22 @@ use rocket::serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use ripemd256;
 
+use super::task::Task;
+
 #[derive(Deserialize, Serialize, PartialEq, Clone)]
 pub struct User {
     pub id: Uuid,
     pub username: String,
-    pub password: Vec<u8>
+    pub password: Vec<u8>,
+    pub tasks: Vec<Task>
 }
 impl User {
     pub fn new(name: &str, pass: & str) -> Self {
         Self {
             id: Uuid::new_v4(),
             username: name.to_string(),
-            password: Ripemd256::digest(pass.as_bytes()).to_vec()
+            password: Ripemd256::digest(pass.as_bytes()).to_vec(),
+            tasks: Vec::new()
         }
     }
     pub fn is_valid_password(&self, pass: String) -> bool {
