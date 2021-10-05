@@ -2,9 +2,9 @@
 
 mod controllers;
 mod models;
-mod services;
+mod service;
 use rocket::config::{Config, SecretKey};
-use crate::{controllers::{signin, signout, signup, userlist}, services::UserService};
+use crate::{controllers::user_controller, service::KickService};
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
@@ -26,14 +26,14 @@ async fn main() -> Result<(), rocket::Error> {
     
     rocket::custom(config)
         .mount("/api/id", routes![
-            signin, 
-            signup,
-            signout
+            user_controller::signin, 
+            user_controller::signup,
+            user_controller::signout
         ])
         .mount("/", routes![
-            userlist
+            user_controller::userlist
         ])
-        .manage(UserService::new())
+        .manage(KickService::new())
         .launch()
         .await
 }

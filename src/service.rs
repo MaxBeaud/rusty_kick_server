@@ -1,11 +1,11 @@
 use std::sync::Mutex;
-use crate::models::User;
+use crate::models::user::User;
 
 
-pub struct UserService {
+pub struct KickService {
     users: Mutex<Vec<User>>
 }
-impl UserService {
+impl KickService {
     pub fn new() -> Self {
         Self{users: Mutex::new(Vec::new())}
     }

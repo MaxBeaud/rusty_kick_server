@@ -34,7 +34,6 @@ pub struct UserSignIn {
     pub username: String,
     pub password: String,
 }
-
 impl fmt::Debug for UserSignUp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_fmt(format_args!("name:{} hash:{}",self.username, self.password))
