@@ -3,7 +3,7 @@ use crate::models::user::{User, UserSignIn, UserSignUp};
 use crate::service::KickService;
 
 #[post("/signin", data="<model>")]
-pub async fn signin(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {
+pub async fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {
     
     match model {
         Some(e) => {
@@ -33,7 +33,7 @@ pub async fn signin(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, servic
 }
 
 #[post("/signup", data="<model>")]
-pub async fn signup(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {       
+pub async fn sign_up(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {       
 
     match model {      
         Some(e) => {
@@ -55,12 +55,12 @@ pub async fn signup(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, servic
 }
 
 #[post("/signout")]
-pub async fn signout(jar: &CookieJar<'_>) -> (Status, Json<String>) {       
+pub async fn sign_out(jar: &CookieJar<'_>) -> (Status, Json<String>) {       
     jar.remove_private(Cookie::named("USER"));
     (Status::Ok, Json(String::from("")))
 }
 
 #[get("/userlist")]
-pub async fn userlist(service: &State<KickService>) -> Json<Vec<User>> {       
+pub async fn user_list(service: &State<KickService>) -> Json<Vec<User>> {       
     Json(service.get_users())
 }
