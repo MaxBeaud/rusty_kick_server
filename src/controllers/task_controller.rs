@@ -1,7 +1,6 @@
 use crate::models::task::Task;
 use crate::{models::task::AddTaskReq};
 use crate::service::KickService;
-use chrono::{DateTime, TimeZone, Utc};
 use rocket::http::Cookie;
 use rocket::{State, http::{CookieJar, Status}, serde::json::Json};
 
@@ -18,7 +17,7 @@ pub async fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, serv
             let user = service.get_user(cookie.value());
             match user {
                 Some(mut user) => {
-                    let datetime: DateTime<Utc> = Utc.from_utc_datetime(&model.deadline);
+                    let datetime =  model.deadline;
                     user.tasks.push(Task::new(&model.name, datetime));
                     (Status::Ok, None)
                 }
