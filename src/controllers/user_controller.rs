@@ -3,7 +3,7 @@ use crate::models::user::{User, UserSignIn, UserSignUp};
 use crate::service::KickService;
 
 #[post("/signin", data="<model>")]
-pub async fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {
+pub fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {
     
     match model {
         Some(e) => {
@@ -13,7 +13,7 @@ pub async fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, servi
                     return (Status::Accepted, Json(user.username));
                 }
             }
-            (Status::Unauthorized, Json(String::from("WOOPELAYE")))
+            (Status::Unauthorized, Json(String::from("Utilisateur non valide")))
         },
         None => {
             let cookie = jar.get_private_pending("USER");
@@ -22,10 +22,10 @@ pub async fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, servi
                     if service.contains_user(cookie.value()) {
                         return (Status::Accepted, Json(cookie.value().to_string()));
                     }
-                    (Status::Unauthorized, Json(String::from("WOOPELAYE")))
+                    (Status::Unauthorized, Json(String::from("Aucune authentification valide")))
                 }
                 None => {
-                    (Status::Unauthorized, Json(String::from("WOOPELAYE")))
+                    (Status::Unauthorized, Json(String::from("Aucune authentification valide")))
                 }
             }
         }
@@ -33,8 +33,7 @@ pub async fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, servi
 }
 
 #[post("/signup", data="<model>")]
-pub async fn sign_up(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {       
-
+pub fn sign_up(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {       
     match model {      
         Some(e) => {
             let user_to_add = User::new(&e.username, &e.password);
@@ -55,12 +54,12 @@ pub async fn sign_up(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, servi
 }
 
 #[post("/signout")]
-pub async fn sign_out(jar: &CookieJar<'_>) -> (Status, Json<String>) {       
+pub fn sign_out(jar: &CookieJar<'_>) -> (Status, Json<String>) {       
     jar.remove_private(Cookie::named("USER"));
     (Status::Ok, Json(String::from("")))
 }
 
 #[get("/userlist")]
-pub async fn user_list(service: &State<KickService>) -> Json<Vec<User>> {       
+pub fn user_list(service: &State<KickService>) -> Json<Vec<User>> {       
     Json(service.get_users())
 }

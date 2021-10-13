@@ -5,7 +5,7 @@ use rocket::http::Cookie;
 use rocket::{State, http::{CookieJar, Status}, serde::json::Json};
 
 #[post("/add", data = "<model>")]
-pub async fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &State<KickService>) 
+pub fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &State<KickService>) 
     -> (Status, Option<Json<String>>) 
 {
     match model {
