@@ -8,7 +8,7 @@ use rocket::{State, http::{CookieJar, Status}, serde::json::Json};
 pub fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &State<KickService>) 
     -> (Status, Option<Json<String>>) 
 {
-    match model {
+    return match model {
         Some(model) => {
 
             let cookie = jar.get_private_pending("USER")
@@ -16,10 +16,11 @@ pub fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &
 
             let user = service.get_user(cookie.value());
             match user {
-                Some(mut user) => {
+                Some(user) => {
                     let datetime =  model.deadline;
-                    user.tasks.push(Task::new(&model.name, datetime));
-                    (Status::Ok, None)
+                    let mut u = user.lock().unwrap().to_owned();
+                    u.tasks.push(Task::new(&model.name, datetime));
+                    (Status::Ok, Some(Json(String::from(""))))
                 }
                 None => {
                     (Status::Unauthorized, Some(Json(String::from("Utilisateur non authentifié"))))
@@ -29,5 +30,5 @@ pub fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &
         None => {
             (Status::BadRequest, Some(Json(String::from("Pas de tâche à ajouter"))))
         }
-    }
+    };
 }
