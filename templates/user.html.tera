@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Tera Demo</title>
+    </head>
+    <style>
+        ul{
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        li{
+            margin-left: 10px;
+            margin-bottom: 10px;
+            border: 2px solid black; 
+            background-color:burlywood; 
+            padding: 5px;
+        }
+    </style>
+    <body>
+        <p>{{user.id}}</p>
+        <h2>Voici l'utilisateur {{user.username}}</h2>
+        <br/>
+        <ul>
+            {% for t in user.tasks %}
+                <li>
+                    <p><b>Name:</b> {{t.name}} </p>          
+                    <p><b>Deadline:</b> {{t.deadline}} </p>
+                    <p><b>Percent done:</b> {{t.percent_done}} </p>
+                    <p><b>Created on:</b> {{t.created_on}} </p>
+                </li>
+            {% endfor %} 
+        </ul>     
+    </body>
+</html>

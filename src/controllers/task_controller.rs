@@ -15,12 +15,12 @@ pub fn add_user(model: Option<Json<AddTaskReq>>, jar: &CookieJar<'_>, service: &
                             .unwrap_or_else(|| Cookie::new("none", "####"));
 
             let user = service.get_user(cookie.value());
+
             match user {
                 Some(user) => {
-                    let datetime =  model.deadline;
-                    let mut u = user.lock().unwrap().to_owned();
-                    u.tasks.push(Task::new(&model.name, datetime));
-                    (Status::Ok, Some(Json(String::from(""))))
+                    let datetime =  model.deadline;               
+                    service.add_task(&user.id, Task::new(&model.name, datetime));
+                    (Status::Ok, Some(Json(String::from("Ajouté"))))
                 }
                 None => {
                     (Status::Unauthorized, Some(Json(String::from("Utilisateur non authentifié"))))

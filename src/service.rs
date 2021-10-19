@@ -1,6 +1,6 @@
 use std::sync::Mutex;
-use crate::models::user::User;
-
+use uuid::Uuid;
+use crate::models::{task::Task, user::User};
 
 pub struct KickService {
     users: Mutex<Vec<User>>
@@ -18,16 +18,16 @@ impl KickService {
         }
         false
     }
-    pub fn get_users(&self) -> Vec<User> {
+    pub fn get_users_val(&self) -> Vec<User> {
         let locked = self.users.lock().unwrap();
         locked.to_vec()
     }
-    //retourner un mutex guard avec référence au user du vec
-    pub fn get_user(&self, name: &str) -> Option<Mutex<&User>> {
+    
+    pub fn get_user(&self, name: &str) -> Option<User> {
         if self.contains_user(name) {
             for user in self.users.lock().unwrap().iter() {
                 if user.username == name {
-                    return Some(Mutex::from(user));
+                    return Some(user.clone());
                 }
             }
             None
@@ -36,8 +36,15 @@ impl KickService {
             None
         }
     }
-    pub fn add(&self, value: User) {
+    pub fn add_user(&self, value: User) {
         let mut locked = self.users.lock().unwrap();
         locked.push(value);
+    }
+    pub fn add_task(&self, id: &Uuid, task: Task) {
+        for user in self.users.lock().unwrap().iter_mut() {
+            if user.id == *id {
+                user.tasks.push(task.clone());                
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 use chrono::{NaiveDate, Utc};
-use rocket::{ serde::{Deserialize, Serialize}};
+use rocket::{serde::{Deserialize, Serialize}};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]

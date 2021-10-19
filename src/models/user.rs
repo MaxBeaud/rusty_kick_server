@@ -29,7 +29,13 @@ impl User {
 }
 impl fmt::Debug for User {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_fmt(format_args!("id:{} username:{} password:{:?}", self.id.to_hyphenated(),self.username, self.password))
+        f.write_fmt(
+            format_args!(
+                "id:{} username:{} password:{}", 
+                self.id.to_hyphenated(),self.username, 
+                hex::encode(self.password.clone())
+            )
+        )
     }
 }
 
@@ -46,6 +52,6 @@ pub struct UserSignIn {
 }
 impl fmt::Debug for UserSignUp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_fmt(format_args!("name:{} hash:{}",self.username, self.password))
+        f.write_fmt(format_args!("name:{} hash:{:X?}",self.username, self.password.as_bytes()))
     }
 }

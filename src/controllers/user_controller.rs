@@ -1,13 +1,16 @@
+use std::collections::HashMap;
+
 use rocket::{State, http::{Cookie, CookieJar, Status}, serde::json::Json};
 use crate::models::user::{User, UserSignIn, UserSignUp};
 use crate::service::KickService;
+use rocket_dyn_templates::{Template};
 
 #[post("/signin", data="<model>")]
 pub fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {
     
     match model {
         Some(e) => {
-            for user in service.get_users() {
+            for user in service.get_users_val() {
                 if user.username == e.username && user.is_valid_password(e.password.clone()) {
                     jar.add_private(Cookie::new("USER", e.username.to_string()));
                     return (Status::Accepted, Json(user.username));
@@ -41,7 +44,7 @@ pub fn sign_up(model: Option<Json<UserSignUp>>, jar: &CookieJar<'_>, service: &S
                 return (Status::Conflict, Json(String::from("Compte existe déjà")));
             }
             else if e.password == e.password_confirm {        
-                service.add(user_to_add);
+                service.add_user(user_to_add);
                 jar.add_private(Cookie::new("USER", e.username.clone()));
                 return (Status::Created, Json(e.username.clone()));
             }
@@ -60,6 +63,20 @@ pub fn sign_out(jar: &CookieJar<'_>) -> (Status, Json<String>) {
 }
 
 #[get("/userlist")]
-pub fn user_list(service: &State<KickService>) -> Json<Vec<User>> {       
-    Json(service.get_users())
+pub fn user_list(service: &State<KickService>) -> Json<Vec<User>> { 
+    Json(service.get_users_val())
+}
+
+#[get("/userlistpretty")]
+pub fn user_list_pretty(service: &State<KickService>) -> Template {
+    let mut context: HashMap<&str, Vec<User>> = HashMap::new();
+    context.insert("users", service.get_users_val());
+    Template::render("user_list", &context)
+}
+
+#[get("/userlistpretty/<username>")]
+pub fn user_pretty(service: &State<KickService>, username: String) -> Template {
+    let mut context: HashMap<&str, User> = HashMap::new();
+    context.insert("user", service.get_user(&username).unwrap());
+    Template::render("user", &context)
 }

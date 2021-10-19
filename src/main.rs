@@ -3,6 +3,7 @@
 mod controllers;
 mod models;
 mod service;
+use rocket_dyn_templates::Template;
 use rocket::config::{Config, SecretKey};
 use crate::{controllers::{task_controller, user_controller}, service::KickService};
 
@@ -25,13 +26,16 @@ async fn main() -> Result<(), rocket::Error> {
     config.secret_key = SecretKey::generate().unwrap_or_else(|| SecretKey::from(&rand));
     
     rocket::custom(config)
+        .attach(Template::fairing())
         .mount("/api/id", routes![
             user_controller::sign_in, 
             user_controller::sign_up,
             user_controller::sign_out
         ])
         .mount("/", routes![
-            user_controller::user_list
+            user_controller::user_list,
+            user_controller::user_list_pretty,
+            user_controller::user_pretty
         ])
         .mount("/api", routes![
             task_controller::add_user
