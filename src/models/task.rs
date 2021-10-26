@@ -7,7 +7,7 @@ pub struct Task {
     pub id: Uuid,
     pub name: String,
     pub deadline: NaiveDate,
-    pub percent_done: i32,
+    pub percent_done: f32,
     pub created_on: NaiveDate
 }
 impl Task {
@@ -16,7 +16,7 @@ impl Task {
             id: Uuid::new_v4(),
             name: name.to_string(),
             deadline,
-            percent_done: 0,
+            percent_done: 0.0,
             created_on: Utc::now().naive_local().date()
         } 
     }
@@ -25,7 +25,7 @@ impl Task {
             id: Uuid::new_v4(),
             name: String::from(""),
             deadline: Utc::now().naive_local().date(),
-            percent_done: 0,
+            percent_done: 0.0,
             created_on: Utc::now().naive_local().date()
         } 
     }
@@ -35,7 +35,7 @@ pub struct TaskDetail {
     pub id: Uuid,
     pub name: String,
     pub deadline: NaiveDate,
-    pub percent_done: i32,
+    pub percent_done: f32,
     pub percent_time_spent: i64
 }
 impl TaskDetail {
@@ -49,7 +49,7 @@ impl TaskDetail {
             name: task.name,
             deadline: task.deadline,
             percent_done: task.percent_done,
-            percent_time_spent: elapsed.num_days() / total.num_days() * 100
+            percent_time_spent: if !total.num_days() == 0 {elapsed.num_days() / total.num_days() * 100} else{0}
         }
     }
 }

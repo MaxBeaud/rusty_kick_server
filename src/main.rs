@@ -38,8 +38,11 @@ async fn main() -> Result<(), rocket::Error> {
             user_controller::user_pretty
         ])
         .mount("/api", routes![
-            task_controller::add_user
-        ])       
+            task_controller::add_user,
+            task_controller::get_all_tasks,
+            task_controller::get_task,
+            task_controller::update_progress
+        ])
         .manage(KickService::new())
         .launch()
         .await

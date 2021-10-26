@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-
 use rocket::{State, http::{Cookie, CookieJar, Status}, serde::json::Json};
 use crate::models::user::{User, UserSignIn, UserSignUp};
 use crate::service::KickService;
-use rocket_dyn_templates::{Template};
+use rocket_dyn_templates::Template;
 
 #[post("/signin", data="<model>")]
 pub fn sign_in(model: Option<Json<UserSignIn>>, jar: &CookieJar<'_>, service: &State<KickService>) -> (Status, Json<String>) {

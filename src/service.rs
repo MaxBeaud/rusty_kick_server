@@ -43,7 +43,14 @@ impl KickService {
     pub fn add_task(&self, id: &Uuid, task: Task) {
         for user in self.users.lock().unwrap().iter_mut() {
             if user.id == *id {
-                user.tasks.push(task.clone());                
+                user.add_task(task.clone());                
+            }
+        }
+    }
+    pub fn update_progress(&self, user_id: Uuid, task_id: Uuid, value: f32, ) {
+        for user in self.users.lock().unwrap().iter_mut() {
+            if user.id == user_id {
+                user.tasks.iter_mut().find(|t| t.id == task_id).unwrap().percent_done = value;
             }
         }
     }
