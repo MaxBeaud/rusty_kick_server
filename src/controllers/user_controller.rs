@@ -17,12 +17,6 @@ pub fn sign_in(
 ) -> (Status, Json<String>) {
     match model {
         Some(e) => {
-            // for user in service.get_users_val() {
-            //     if user.username == e.username && user.is_valid_password(e.password.clone()) {
-            //         jar.add_private(Cookie::new("USER", e.username.to_string()));
-            //         return (Status::Accepted, Json(user.username));
-            //     }
-            // }
             if service.get_users_val().par_iter().any(|user| user.username == e.username && user.is_valid_password(e.password.clone())) {
                 jar.add_private(Cookie::new("USER", e.username.to_string()));
                 return (Status::Accepted, Json(e.username.to_string()));
