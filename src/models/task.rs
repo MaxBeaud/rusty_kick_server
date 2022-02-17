@@ -20,15 +20,6 @@ impl Task {
             created_on: Utc::now().naive_local().date(),
         }
     }
-    // pub fn empty() -> Self {
-    //     Self {
-    //         id: Uuid::new_v4(),
-    //         name: String::from(""),
-    //         deadline: Utc::now().naive_local().date(),
-    //         percent_done: 0.0,
-    //         created_on: Utc::now().naive_local().date()
-    //     }
-    // }
 }
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct TaskDetail {

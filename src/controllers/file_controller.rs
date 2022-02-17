@@ -1,9 +1,9 @@
 use rocket::{Data, State, http::{Cookie, CookieJar, Status}, serde::json::Json, tokio::{fs::OpenOptions, io::AsyncWriteExt}};
 use uuid::Uuid;
-use crate::{models::{task::TaskDetail, user::User}, service::KickService};
+use crate::{service::KickService};
 
 #[post("/images", data = "<image>")]
-pub async fn upload_image(jar: &CookieJar<'_>, service: &State<KickService>, image: Data<'_>) -> (Status, Json<String>) {
+pub async fn upload_image(jar: &CookieJar<'_>, service: &State<KickService>, mut image: Data<'_>) -> (Status, Json<String>) {
     let cookie = jar
         .get_private_pending("USER")
         .unwrap_or_else(|| Cookie::new("none", "####"));
@@ -19,7 +19,7 @@ pub async fn upload_image(jar: &CookieJar<'_>, service: &State<KickService>, ima
                 .open(file_path)
                 .await.unwrap();
 
-            file.write_all(image.).unwrap();
+            file.write_all(image.peek(512).await).await.unwrap();
 
             (Status::Ok, Json(image_id))
         },
